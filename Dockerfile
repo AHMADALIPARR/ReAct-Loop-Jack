@@ -5,6 +5,8 @@ FROM alpine:3.19 AS builder
 RUN apk add --no-cache ghc cabal musl-dev gmp-dev z3 build-base linux-headers
 
 WORKDIR /workspace
+# Repo layout: Haskell sources live in src/ (hs-source-dirs: src),
+# Lean proof in lean/, Elixir supervisor in supervisor/.
 COPY . .
 
 # Initialize cabal and compile. 

@@ -25,7 +25,7 @@ The supervisor mesh for the MobiusBridge Haskell worker.
 
 ## The quaternion (Haskell)
 
-`Quaternion.hs` (user's code, verbatim) defines the 4D state vector
+`src/Quaternion.hs` (user's code, verbatim) defines the 4D state vector
 `QState` (Real, i, j, k) and `entangle` — the Hamilton product,
 non-commutative state fusion. It is a module in the `mobius-worker`
 package (`other-modules`).
