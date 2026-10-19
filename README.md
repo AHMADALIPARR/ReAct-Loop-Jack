@@ -1,6 +1,6 @@
 <div align="center">
 
-# Mobius Bridge
+# ReAct-LOOP-Jack
 
 **State preservation, supervised telemetry ingestion, and quaternion spatial graphs.**
 
