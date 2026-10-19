@@ -1,0 +1,43 @@
+cabal-version: 2.4
+name: mobius-bridge
+version: 0.1.0.0
+synopsis: Cycle-Stealing Invariant — Liquid Haskell GHC-plugin gate + IO shell
+description:
+  The SluiceState / CycleInvariant / executeBatch preservation theorem
+  (MobiusBridge) with an IO shell (Main) whose build is gated by the
+  Liquid Haskell GHC plugin: if the SMT solver cannot prove the
+  GoodState implication, GHC halts and refuses to emit the binary.
+license: LicenseRef-Sovereign-Leviathan-SL-AGPL3-001
+license-file: LICENSE
+author: Ahmad Ali Parr
+maintainer: ahmad.parr@snapkittywest.com
+build-type: Simple
+
+-- ASSISTANT-ADDED scaffolding (not the user's stanza): the package
+-- header above + build-depends below are the minimal fields a valid
+-- .cabal file needs. The executable stanza below is the user's,
+-- verbatim. build-depends must list liquidhaskell so GHC can load
+-- the -fplugin=LiquidHaskell plugin at compile time.
+executable mobius-worker
+  main-is: Main.hs
+  other-modules:
+    MobiusBridge,
+    Quaternion
+  -- ... other fields ...
+  ghc-options:
+    -fplugin=LiquidHaskell
+    -fplugin-opt=LiquidHaskell:--no-termination
+    -O2
+    -static
+    -threaded
+    -rtsopts
+    "-with-rtsopts=-N"
+  cc-options: -static
+  ld-options: -static -pthread
+  hs-source-dirs: .
+  default-language: Haskell2010
+  build-depends:
+    base >= 4,
+    bytestring,
+    liquidhaskell,
+    network

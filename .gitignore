@@ -1,0 +1,28 @@
+# Haskell / Cabal
+dist-newstyle/
+dist/
+.stack-work/
+*.o
+*.hi
+*.dyn_o
+*.dyn_hi
+cabal.project.local
+cabal.project.local~
+
+# Liquid Haskell generated artifacts (regenerated on every build)
+.liquid/
+
+# Elixir / Mix
+/_build/
+/deps/
+*.beam
+*.ez
+erl_crash.dump
+inbox/
+
+# Editor / OS
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
