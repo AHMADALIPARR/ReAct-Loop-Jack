@@ -26,3 +26,7 @@ inbox/
 *~
 .idea/
 .vscode/
+.build/
+supervisor/_build/
+supervisor/deps/
+supervisor/inbox/

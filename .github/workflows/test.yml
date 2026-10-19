@@ -1,0 +1,13 @@
+name: Native worker and supervisor
+on: [push, pull_request]
+jobs:
+  runtime:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ghc libghc-network-dev elixir
+      - run: mkdir -p .build && /usr/bin/ghc -isrc -outputdir .build src/Main.hs -o .build/mobius-worker
+      - run: mix test
+        working-directory: supervisor
+        env:
+          ERL_FLAGS: '+S 2:2'

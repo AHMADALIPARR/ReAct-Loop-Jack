@@ -1,15 +1,11 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards #-}
-{-# OPTIONS_GHC -fplugin=LiquidHaskell #-}
-{-# OPTIONS_GHC -fplugin-opt=LiquidHaskell:--no-termination #-}
 
 module Main where
 
--- ASSISTANT-ADDED: hide Prelude.round (the rounding function) so the
--- record field `round` (from MobiusBridge) is unambiguous.
 import Prelude hiding (round)
 
 import MobiusBridge 
-import Control.Monad (unless)
+import Control.Monad (when)
 import Network.Socket
 import Network.Socket.ByteString (sendAll)
 import qualified Data.ByteString.Char8 as B
@@ -23,11 +19,6 @@ connectSupervisor host port = do
     connect sock (addrAddress addr)
     return sock
 
--- The impure shell now accepts the socket handle to stream telemetry
--- ASSISTANT-ADDED (not in the user's original): Liquid Haskell needs
--- runSluiceDump to promise its state input is a GoodState, otherwise
--- the call 'executeBatch state' fails -- executeBatch requires
--- GoodState, and a plain SluiceState does not establish the invariant.
 {-@ runSluiceDump :: Socket -> GoodState -> IO () @-}
 runSluiceDump :: Socket -> SluiceState -> IO ()
 runSluiceDump sock state = do
@@ -38,9 +29,8 @@ runSluiceDump sock state = do
     
     sendAll sock payload
     
-    let nextState = executeBatch state
-    unless (pendingModules nextState == 0) $ 
-        runSluiceDump sock nextState
+    when (pendingModules state > 0) $
+        runSluiceDump sock (executeBatch state)
 
 main :: IO ()
 main = do

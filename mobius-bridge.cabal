@@ -12,35 +12,35 @@ license-file: LICENSE
 author: Ahmad Ali Parr
 maintainer: ahmad.parr@snapkittywest.com
 build-type: Simple
+category: Distributed Computing
 
--- ASSISTANT-ADDED scaffolding (not the user's stanza): the package
--- header above + build-depends below are the minimal fields a valid
--- .cabal file needs. The executable stanza below is the user's,
--- verbatim. build-depends must list liquidhaskell so GHC can load
--- the -fplugin=LiquidHaskell plugin at compile time.
+flag verify
+  description: Require the Liquid Haskell invariant gate during compilation
+  default: True
+  manual: True
+
 executable mobius-worker
   main-is: Main.hs
   other-modules:
     MobiusBridge,
     Quaternion
-  -- ... other fields ...
   ghc-options:
-    -fplugin=LiquidHaskell
-    -fplugin-opt=LiquidHaskell:--no-termination
-    -O2
     -static
     -threaded
     -rtsopts
     "-with-rtsopts=-N"
   cc-options: -static
   ld-options: -static -pthread
-  -- REORG 2026-10-18: Haskell sources moved from repo root into src/
-  -- (src/Main.hs, src/MobiusBridge.hs, src/Quaternion.hs). main-is and
-  -- other-modules are unchanged names; hs-source-dirs now points at src/.
   hs-source-dirs: src
   default-language: Haskell2010
   build-depends:
-    base >= 4,
+    base >= 4.13 && < 5,
     bytestring,
-    liquidhaskell,
     network
+  if flag(verify)
+    build-depends: liquidhaskell
+    ghc-options: -fplugin=LiquidHaskell -fplugin-opt=LiquidHaskell:--no-termination
+
+source-repository head
+  type: git
+  location: https://github.com/AHMADALIPARR/mobius-bridge.git
