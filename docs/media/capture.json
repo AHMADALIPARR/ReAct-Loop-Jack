@@ -1,0 +1,27 @@
+{
+  "capture_kind": "Actual command output rendered as terminal cards; presentation timing is edited",
+  "stages": [
+    [
+      "$ mix run / quaternion graph",
+      [
+        "{:ok, [0, 1]}",
+        "%{",
+        "  edges: %{{0, 1} => 1.4142135623730951},",
+        "  next_id: 2,",
+        "  nodes: %{0 => {1.0, 0.0, 0.0, 0.0}, 1 => {0.0, 1.0, 0.0, 0.0}}",
+        "}"
+      ]
+    ],
+    [
+      "$ mix test --seed 0",
+      [
+        ".....",
+        "",
+        "Finished in 0.5 seconds (0.00s async, 0.5s sync)",
+        "5 tests, 0 failures",
+        "",
+        "Randomized with seed 0"
+      ]
+    ]
+  ]
+}
