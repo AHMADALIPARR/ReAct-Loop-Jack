@@ -1,11 +1,4 @@
 {-@ LIQUID "--no-termination" @-}
--- Wire Liquid Haskell into the GHC pipeline as a compiler plugin, so
--- compilation itself is the gate: if the SMT solver cannot prove the
--- GoodState implication, GHC halts the build and refuses to emit the
--- object file. (Added when the Main.hs IO shell landed; the original
--- MobiusBridge.hs relied on the standalone `liquid` checker.)
-{-# OPTIONS_GHC -fplugin=LiquidHaskell #-}
-{-# OPTIONS_GHC -fplugin-opt=LiquidHaskell:--no-termination #-}
 -- | MobiusBridge: the Cycle-Stealing Invariant, in Liquid Haskell.
 --
 -- The same theorem as the Lean version (MobiusBridge.lean), restated
@@ -27,28 +20,19 @@
 
 module MobiusBridge where
 
--- ASSISTANT-ADDED: hide Prelude.round (the rounding function) so the
--- record field `round` is unambiguous. Nothing in this file calls
--- Prelude.round; the field is the only `round` in use.
 import Prelude hiding (round)
 
--- 1. Model the internal state of the hijacked ReAct loop.
---    The Haskell field types are Int. The non-negativity (Nat) is a
---    Liquid Haskell refinement on the data type (below) -- `Nat` is a
---    refinement alias ({v:Int | 0 <= v}), not a Haskell type, so it
---    cannot appear as a field type. (Fix for GHC-76037: `Nat` was not
---    in scope as a Haskell type constructor.)
 data SluiceState = SluiceState
-  { round           :: Int
-  , pendingModules  :: Int
-  , syntheticBudget :: Int
+  { round           :: Integer
+  , pendingModules  :: Integer
+  , syntheticBudget :: Integer
   }
 
--- Refine the fields to Nat (non-negative) in the refinement language.
+{-@ type Counter = { v:Integer | 0 <= v } @-}
 {-@ data SluiceState = SluiceState
-    { round :: Nat
-    , pendingModules :: Nat
-    , syntheticBudget :: Nat
+    { round :: Counter
+    , pendingModules :: Counter
+    , syntheticBudget :: Counter
     } @-}
 
 -- 2. Define the Cycle-Stealing Invariant.

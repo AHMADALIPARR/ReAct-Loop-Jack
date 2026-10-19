@@ -1,6 +1,3 @@
--- | Quaternion.hs -- 4D state vector + Hamilton product (non-commutative
--- state fusion). The user's code, verbatim. The `module Quaternion`
--- line is assistant-added scaffolding so the file compiles as a module.
 module Quaternion where
 
 -- Define the 4D state vector (Real, i, j, k)

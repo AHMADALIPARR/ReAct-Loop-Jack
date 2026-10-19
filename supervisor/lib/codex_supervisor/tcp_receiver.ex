@@ -1,45 +1,40 @@
 defmodule CodexSupervisor.TcpReceiver do
   use GenServer
-  require Logger
-
-  @inbox_path "inbox/devFlow-finance-twin/telemetry.log"
-
-  def start_link(port) do
-    GenServer.start_link(__MODULE__, port, name: __MODULE__)
-  end
-
+  def start_link(port), do: GenServer.start_link(__MODULE__, port, name: __MODULE__)
+  def port, do: GenServer.call(__MODULE__, :port)
   def init(port) do
-    # Bind raw TCP socket with line-based framing
-    {:ok, listen_socket} = :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
-    Logger.info("Supervisor listening for verified Haskell workers on TCP #{port}")
-    
-    # Ensure the target inbox routing directory exists
-    File.mkdir_p!(Path.dirname(@inbox_path))
-    
-    send(self(), :accept)
-    {:ok, %{socket: listen_socket}}
+    {:ok, socket} = :gen_tcp.listen(port, [:binary, packet: :line, packet_size: 4096, active: false, reuseaddr: true, ip: {127,0,0,1}])
+    acceptor = spawn_link(fn -> accept(socket) end)
+    {:ok, %{socket: socket, acceptor: acceptor}}
   end
-
-  def handle_info(:accept, %{socket: listen_socket} = state) do
-    {:ok, client_socket} = :gen_tcp.accept(listen_socket)
-    
-    # Spawn a lightweight worker process to handle the continuous stream
-    Task.start(fn -> handle_stream(client_socket) end)
-    
-    # Immediately accept the next connection
-    send(self(), :accept)
-    {:noreply, state}
+  def handle_call(:port, _from, s) do
+    {:ok, {_, port}} = :inet.sockname(s.socket)
+    {:reply, port, s}
   end
-
-  defp handle_stream(client_socket) do
-    case :gen_tcp.recv(client_socket, 0) do
-      {:ok, data} ->
-        # Route raw string telemetry straight to the twin's inbox
-        File.write!(@inbox_path, data, [:append])
-        handle_stream(client_socket)
-        
-      {:error, :closed} ->
-        Logger.info("Worker stream closed cleanly. Batch complete.")
+  def terminate(_, s), do: :gen_tcp.close(s.socket)
+  defp accept(listener) do
+    case :gen_tcp.accept(listener) do
+      {:ok, socket} ->
+        {:ok, pid} = Task.Supervisor.start_child(CodexSupervisor.Workers, fn ->
+          receive do {:socket, sock} -> stream(sock, "#{System.system_time(:microsecond)}-#{System.unique_integer([:positive])}") after 5000 -> :ok end
+        end)
+        :ok = :gen_tcp.controlling_process(socket, pid)
+        send(pid, {:socket, socket})
+        accept(listener)
+      {:error, :closed} -> :ok
+      {:error, reason} -> exit(reason)
+    end
+  end
+  defp stream(socket, worker) do
+    case :gen_tcp.recv(socket, 0, 60000) do
+      {:ok, line} ->
+        path = Application.get_env(:codex_supervisor, :telemetry_path, "inbox/devFlow-finance-twin/telemetry.log")
+        File.mkdir_p!(Path.dirname(path))
+        case DevFlowTwin.Ledger.parse(line) do
+          {:ok, _} -> File.write!(path, "WORKER:" <> worker <> "|" <> line, [:append]); stream(socket, worker)
+          {:error, _} -> :gen_tcp.close(socket)
+        end
+      {:error, _} -> :gen_tcp.close(socket)
     end
   end
 end
