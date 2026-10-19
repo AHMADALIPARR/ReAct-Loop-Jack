@@ -14,7 +14,7 @@ Lean 4 · Haskell · Elixir/OTP
 
 ---
 
-Mobius Bridge connects a mathematical state-transition model to a native worker and an observable ingestion service. Lean expresses the preservation theorem. Liquid Haskell supplies a refinement specification and a compiler-plugin gate. The Haskell worker emits execution-state records, while the Elixir application receives, journals, validates, and exposes those records through an OTP supervision tree.
+ ReAct-LOOP-Jack connects a mathematical state-transition model to a native worker and an observable ingestion service. Lean expresses the preservation theorem. Liquid Haskell supplies a refinement specification and a compiler-plugin gate. The Haskell worker emits execution-state records, while the Elixir application receives, journals, validates, and exposes those records through an OTP supervision tree.
 
 A separate binary ingestion path stores quaternion samples as a spatial graph. Textual counter telemetry and binary spatial samples retain their own formats and APIs, so neither path depends on interpreting unrelated data as the other representation.
 
