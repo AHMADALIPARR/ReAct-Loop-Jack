@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y ghc libghc-network-dev elixir
-      - run: mkdir -p .build && ghc -isrc -outputdir .build src/Main.hs -o .build/mobius-worker
+      - run: mkdir -p .build && /usr/bin/ghc -isrc -outputdir .build src/Main.hs -o .build/mobius-worker
       - run: mix test
         working-directory: supervisor
         env:
