@@ -6,6 +6,8 @@
 
 Lean 4 · Haskell · Elixir/OTP
 
+[![CI on review branch](https://github.com/AHMADALIPARR/mobius-bridge/actions/workflows/test.yml/badge.svg?branch=repair%2Fcomplete-modules)](https://github.com/AHMADALIPARR/mobius-bridge/actions/workflows/test.yml?query=branch%3Arepair%2Fcomplete-modules) [![Languages: Haskell + Elixir](docs/media/badges/languages.svg)](#architecture) [![Proof: Lean 4](docs/media/badges/proof.svg)](#architecture) [![License: SnapKitty Opaque](docs/media/badges/license.svg)](LICENSE)
+
 <img src="docs/media/demo.gif" alt="Actual quaternion graph output and Elixir test results" width="760">
 
 <sub>Actual program output, rendered as a compact replay. Animation timing is edited.</sub>
